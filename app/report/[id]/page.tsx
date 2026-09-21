@@ -45,6 +45,7 @@ export default function ReportPage() {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- hydrate from localStorage after mount
     setMounted(true);
     const id = params.id as string;
     const d = getDevice(id);

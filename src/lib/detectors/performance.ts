@@ -25,7 +25,7 @@ function sieve(limit: number): number {
 function benchCpuSingle(): BenchmarkResult {
   const limit = 1_000_000;
   const start = performance.now();
-  const primes = sieve(limit);
+  sieve(limit);
   const duration = performance.now() - start;
   // Faster = higher score. ~50ms is excellent, ~500ms is slow.
   const score = clampScore(500 - duration, 0, 500);
@@ -116,6 +116,7 @@ function benchMemory(): BenchmarkResult {
   let sum = 0;
   for (let i = 0; i < arr.length; i++) {
     sum += arr[i];
+    if (sum < 0) break; // keep the read loop from being optimised away
   }
 
   const duration = performance.now() - start;

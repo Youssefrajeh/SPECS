@@ -133,6 +133,7 @@ export default function ComparePage() {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- hydrate from localStorage after mount
     setMounted(true);
     const devices = loadDevices();
     setAllDevices(devices);

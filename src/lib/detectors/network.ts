@@ -38,7 +38,6 @@ async function measureDownloadSpeed(): Promise<number | null> {
     // Download a ~1MB random file. We generate a data URL on the server
     // or use a known endpoint. For self-hosted, we'll use the app's
     // own static assets. Fallback: generate a blob from a script.
-    const testSize = 1024 * 1024; // 1 MB
     const url = '/api/speed-test-download';
 
     const start = performance.now();
