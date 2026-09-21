@@ -51,7 +51,7 @@ export default function RadarChart({ labels, datasets, size = 300 }: RadarChartP
         else ctx.lineTo(x, y);
       }
       ctx.closePath();
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.06)';
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
       ctx.lineWidth = 1;
       ctx.stroke();
     }
@@ -64,7 +64,7 @@ export default function RadarChart({ labels, datasets, size = 300 }: RadarChartP
       ctx.beginPath();
       ctx.moveTo(cx, cy);
       ctx.lineTo(x, y);
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.06)';
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
       ctx.lineWidth = 1;
       ctx.stroke();
 
@@ -72,7 +72,7 @@ export default function RadarChart({ labels, datasets, size = 300 }: RadarChartP
       const labelRadius = maxRadius + 20;
       const lx = cx + labelRadius * Math.cos(angle);
       const ly = cy + labelRadius * Math.sin(angle);
-      ctx.fillStyle = '#9aa0b4';
+      ctx.fillStyle = '#a1a1aa';
       ctx.font = '11px Inter, sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';

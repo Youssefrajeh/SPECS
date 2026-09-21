@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import type { SavedDevice } from '@/src/lib/types';
+import { formatRam } from '@/src/lib/types';
 import { getDevice, deleteDevice } from '@/src/lib/storage';
 import GaugeChart from '@/src/components/GaugeChart';
 import CapabilityBadge from '@/src/components/CapabilityBadge';
@@ -11,12 +12,12 @@ import SensorTester from '@/src/components/SensorTester';
 
 type TabKey = 'hardware' | 'network' | 'browser' | 'performance' | 'sensors';
 
-const TABS: { key: TabKey; label: string; icon: string }[] = [
-  { key: 'hardware', label: 'Hardware', icon: '🖥️' },
-  { key: 'network', label: 'Network', icon: '🌐' },
-  { key: 'browser', label: 'Browser', icon: '🧩' },
-  { key: 'performance', label: 'Performance', icon: '🏎️' },
-  { key: 'sensors', label: 'Sensors', icon: '📡' },
+const TABS: { key: TabKey; label: string }[] = [
+  { key: 'hardware', label: 'Hardware' },
+  { key: 'network', label: 'Network' },
+  { key: 'browser', label: 'Browser' },
+  { key: 'performance', label: 'Performance' },
+  { key: 'sensors', label: 'Sensors' },
 ];
 
 function formatBytes(bytes: number): string {
@@ -65,7 +66,6 @@ export default function ReportPage() {
       <div className="page">
         <div className="container">
           <div className="empty-state">
-            <div className="empty-state-icon">❓</div>
             <h3 className="empty-state-title">Device Not Found</h3>
             <p className="empty-state-text">This device report doesn&apos;t exist or has been deleted.</p>
             <Link href="/" className="btn btn-primary">Back to Dashboard</Link>
@@ -95,17 +95,17 @@ export default function ReportPage() {
                 ← Back to Dashboard
               </Link>
               <h1 className="section-title" style={{ margin: 0 }}>
-                <span className="gradient-text">{device.nickname}</span>
+                {device.nickname}
               </h1>
               <p style={{ fontSize: 'var(--text-sm)', color: 'var(--text-tertiary)', marginTop: 'var(--space-xs)' }}>
                 {formatDate(device.timestamp)}
               </p>
             </div>
-            <div style={{ display: 'flex', gap: 'var(--space-sm)' }}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-sm)' }}>
               {report.benchmarks && (
                 <GaugeChart score={report.benchmarks.overallScore} size={80} label="Score" />
               )}
-              <button className="btn btn-danger btn-sm" onClick={handleDelete}>🗑️ Delete</button>
+              <button className="btn btn-danger btn-sm" onClick={handleDelete}>Delete</button>
             </div>
           </div>
         </div>
@@ -118,7 +118,7 @@ export default function ReportPage() {
               className={`tab ${activeTab === tab.key ? 'active' : ''}`}
               onClick={() => setActiveTab(tab.key)}
             >
-              {tab.icon} {tab.label}
+              {tab.label}
             </button>
           ))}
         </div>
@@ -128,7 +128,6 @@ export default function ReportPage() {
           {activeTab === 'hardware' && (
             <div className="card">
               <div className="card-header">
-                <div className="card-icon blue">🖥️</div>
                 <div>
                   <div className="card-title">Hardware Information</div>
                   <div className="card-subtitle">CPU, memory, display, battery, and storage</div>
@@ -137,7 +136,7 @@ export default function ReportPage() {
               <div className="stat-grid">
                 <div className="stat-item"><span className="stat-label">CPU Cores</span><span className="stat-value">{report.hardware.cpuCores ?? 'N/A'}</span></div>
                 <div className="stat-item"><span className="stat-label">CPU Tier</span><span className="stat-value">{report.hardware.cpuPerformanceTier ?? 'N/A'}</span></div>
-                <div className="stat-item"><span className="stat-label">Device Memory</span><span className="stat-value">{report.hardware.deviceMemory ? `${report.hardware.deviceMemory} GB` : 'N/A'}</span></div>
+                <div className="stat-item"><span className="stat-label">Device Memory</span><span className="stat-value">{formatRam(report.hardware.deviceMemory, report.hardware.deviceMemoryManual)}</span></div>
                 <div className="stat-item"><span className="stat-label">Screen Resolution</span><span className="stat-value">{report.hardware.screenWidth}×{report.hardware.screenHeight}</span></div>
                 <div className="stat-item"><span className="stat-label">Device Pixel Ratio</span><span className="stat-value">{report.hardware.devicePixelRatio}x</span></div>
                 <div className="stat-item"><span className="stat-label">Color Depth</span><span className="stat-value">{report.hardware.colorDepth}-bit</span></div>
@@ -146,7 +145,7 @@ export default function ReportPage() {
                 {report.hardware.battery && (
                   <>
                     <div className="stat-item"><span className="stat-label">Battery Level</span><span className="stat-value">{Math.round(report.hardware.battery.level * 100)}%</span></div>
-                    <div className="stat-item"><span className="stat-label">Charging</span><span className="stat-value">{report.hardware.battery.charging ? '⚡ Yes' : 'No'}</span></div>
+                    <div className="stat-item"><span className="stat-label">Charging</span><span className="stat-value">{report.hardware.battery.charging ? 'Yes' : 'No'}</span></div>
                   </>
                 )}
                 {report.hardware.storage && (
@@ -168,7 +167,6 @@ export default function ReportPage() {
           {activeTab === 'network' && (
             <div className="card">
               <div className="card-header">
-                <div className="card-icon cyan">🌐</div>
                 <div>
                   <div className="card-title">Network Analysis</div>
                   <div className="card-subtitle">Connection type, speed, and latency</div>
@@ -188,7 +186,6 @@ export default function ReportPage() {
           {activeTab === 'browser' && (
             <div className="card">
               <div className="card-header">
-                <div className="card-icon purple">🧩</div>
                 <div>
                   <div className="card-title">Browser Capabilities</div>
                   <div className="card-subtitle">APIs, features, and codec support</div>
@@ -227,7 +224,6 @@ export default function ReportPage() {
           {activeTab === 'performance' && (
             <div className="card">
               <div className="card-header">
-                <div className="card-icon amber">🏎️</div>
                 <div>
                   <div className="card-title">Performance Benchmarks</div>
                   <div className="card-subtitle">CPU, GPU, memory, and JS engine scoring</div>
@@ -250,7 +246,7 @@ export default function ReportPage() {
                       <div key={b.name}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
                           <span style={{ fontWeight: 600 }}>{b.name}</span>
-                          <div style={{ display: 'flex', gap: 'var(--space-lg)', fontSize: 'var(--text-sm)', color: 'var(--text-secondary)' }}>
+                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-lg)', fontSize: 'var(--text-sm)', color: 'var(--text-secondary)' }}>
                             <span style={{ fontFamily: 'var(--font-mono)' }}>{b.rawValue} {b.unit}</span>
                             <span style={{ fontWeight: 700, color: b.score >= 70 ? 'var(--accent-green)' : b.score >= 40 ? 'var(--accent-amber)' : 'var(--accent-red)' }}>
                               {b.score}/100
@@ -278,21 +274,20 @@ export default function ReportPage() {
           {activeTab === 'sensors' && (
             <div className="card">
               <div className="card-header">
-                <div className="card-icon green">📡</div>
                 <div>
                   <div className="card-title">Sensor Access</div>
                   <div className="card-subtitle">Motion, location, camera, and audio devices</div>
                 </div>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-sm)' }}>
-                <SensorTester name="Accelerometer" icon="📐" status={report.sensors.accelerometer} />
-                <SensorTester name="Gyroscope" icon="🔄" status={report.sensors.gyroscope} />
-                <SensorTester name="Magnetometer" icon="🧭" status={report.sensors.magnetometer} />
-                <SensorTester name="Ambient Light" icon="💡" status={report.sensors.ambientLight} />
-                <SensorTester name="Geolocation" icon="📍" status={report.sensors.geolocation} />
-                <SensorTester name="Camera" icon="📷" status={report.sensors.camera} count={report.sensors.cameraDevices} />
-                <SensorTester name="Microphone" icon="🎙️" status={report.sensors.microphone} count={report.sensors.micDevices} />
-                <SensorTester name="Speakers" icon="🔊" status={report.sensors.speakers} count={report.sensors.speakerDevices} />
+                <SensorTester name="Accelerometer" status={report.sensors.accelerometer} />
+                <SensorTester name="Gyroscope" status={report.sensors.gyroscope} />
+                <SensorTester name="Magnetometer" status={report.sensors.magnetometer} />
+                <SensorTester name="Ambient Light" status={report.sensors.ambientLight} />
+                <SensorTester name="Geolocation" status={report.sensors.geolocation} />
+                <SensorTester name="Camera" status={report.sensors.camera} count={report.sensors.cameraDevices} />
+                <SensorTester name="Microphone" status={report.sensors.microphone} count={report.sensors.micDevices} />
+                <SensorTester name="Speakers" status={report.sensors.speakers} count={report.sensors.speakerDevices} />
               </div>
             </div>
           )}

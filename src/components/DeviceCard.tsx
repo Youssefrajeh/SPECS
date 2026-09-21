@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import type { SavedDevice } from '@/src/lib/types';
+import { formatRam } from '@/src/lib/types';
 import GaugeChart from './GaugeChart';
 
 interface DeviceCardProps {
@@ -43,14 +44,13 @@ export default function DeviceCard({ device, onDelete }: DeviceCardProps) {
             }}
             title="Delete device"
           >
-            🗑️
+            Delete
           </button>
         </div>
       )}
 
       <Link href={`/report/${device.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
         <div className="card-header">
-          <div className="card-icon blue">💻</div>
           <div>
             <div className="card-title">{device.nickname}</div>
             <div className="card-subtitle">{formatDate(device.timestamp)}</div>
@@ -62,7 +62,7 @@ export default function DeviceCard({ device, onDelete }: DeviceCardProps) {
             CPU Cores: <span className="device-card-spec-value">{report.hardware.cpuCores ?? 'N/A'}</span>
           </div>
           <div className="device-card-spec">
-            RAM: <span className="device-card-spec-value">{report.hardware.deviceMemory ? `${report.hardware.deviceMemory} GB` : 'N/A'}</span>
+            RAM: <span className="device-card-spec-value">{formatRam(report.hardware.deviceMemory, report.hardware.deviceMemoryManual)}</span>
           </div>
           <div className="device-card-spec">
             Screen: <span className="device-card-spec-value">{report.hardware.screenWidth}×{report.hardware.screenHeight}</span>

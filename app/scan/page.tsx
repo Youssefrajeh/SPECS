@@ -3,6 +3,7 @@
 import { useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import type { DeviceReport, HardwareInfo, NetworkInfo, BrowserCapabilities, BenchmarkResults, SensorInfo } from '@/src/lib/types';
+import { formatRam } from '@/src/lib/types';
 import { detectHardware } from '@/src/lib/detectors/hardware';
 import { detectNetwork } from '@/src/lib/detectors/network';
 import { detectBrowser } from '@/src/lib/detectors/browser';
@@ -14,14 +15,16 @@ import GaugeChart from '@/src/components/GaugeChart';
 import CapabilityBadge from '@/src/components/CapabilityBadge';
 import SensorTester from '@/src/components/SensorTester';
 
+const RAM_KEY = 'specs_manual_ram_gb';
+
 type ScanPhase = 'idle' | 'hardware' | 'network' | 'browser' | 'performance' | 'sensors' | 'complete';
 
-const PHASES: { key: ScanPhase; label: string; icon: string }[] = [
-  { key: 'hardware', label: 'Hardware Detection', icon: '🖥️' },
-  { key: 'network', label: 'Network Analysis', icon: '🌐' },
-  { key: 'browser', label: 'Browser Capabilities', icon: '🧩' },
-  { key: 'performance', label: 'Performance Benchmarks', icon: '🏎️' },
-  { key: 'sensors', label: 'Sensor Access', icon: '📡' },
+const PHASES: { key: ScanPhase; label: string }[] = [
+  { key: 'hardware', label: 'Hardware Detection' },
+  { key: 'network', label: 'Network Analysis' },
+  { key: 'browser', label: 'Browser Capabilities' },
+  { key: 'performance', label: 'Performance Benchmarks' },
+  { key: 'sensors', label: 'Sensor Access' },
 ];
 
 function formatBytes(bytes: number): string {
@@ -54,6 +57,13 @@ export default function ScanPage() {
 
     // 1. Hardware
     const hw = await detectHardware();
+    try {
+      const saved = Number(localStorage.getItem(RAM_KEY));
+      if (saved > 0) {
+        hw.deviceMemory = saved;
+        hw.deviceMemoryManual = true;
+      }
+    } catch {}
     setHardware(hw);
     setProgress(20);
 
@@ -109,23 +119,23 @@ export default function ScanPage() {
 
   return (
     <div className="page">
-      <div className="container" style={{ maxWidth: 900 }}>
-        <div className="animate-fade-in" style={{ textAlign: 'center', marginBottom: 'var(--space-2xl)' }}>
+      <div className="container">
+        <div className="animate-fade-in" style={{ marginBottom: 'var(--space-xl)' }}>
           <h1 className="section-title">
-            <span className="gradient-text">Device Scanner</span>
+            Device Scanner
           </h1>
-          <p className="section-subtitle" style={{ margin: '0 auto var(--space-xl)' }}>
+          <p className="section-subtitle" style={{ marginBottom: 'var(--space-lg)' }}>
             Run a comprehensive diagnostic across all device capabilities.
           </p>
 
           {phase === 'idle' && (
             <button className="btn btn-primary btn-lg" onClick={runScan}>
-              ⚡ Start Diagnostic Scan
+              Start Diagnostic Scan
             </button>
           )}
 
           {phase !== 'idle' && phase !== 'complete' && (
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 'var(--space-lg)' }}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'center', gap: 'var(--space-lg)' }}>
               <ProgressRing progress={progress} size={80} />
               <div style={{ textAlign: 'left' }}>
                 <div style={{ fontSize: 'var(--text-lg)', fontWeight: 700 }}>Scanning...</div>
@@ -147,18 +157,18 @@ export default function ScanPage() {
                 onChange={(e) => setNickname(e.target.value)}
               />
               <button className="btn btn-primary" onClick={handleSave}>
-                💾 Save Results
+                Save Results
               </button>
             </div>
           )}
 
           {savedId && (
-            <div className="animate-scale-in" style={{ display: 'flex', gap: 'var(--space-md)', justifyContent: 'center' }}>
+            <div className="animate-scale-in" style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-md)', justifyContent: 'center' }}>
               <button className="btn btn-primary" onClick={() => router.push(`/report/${savedId}`)}>
-                📊 View Full Report
+                View Full Report
               </button>
               <button className="btn btn-secondary" onClick={() => router.push('/')}>
-                🏠 Back to Dashboard
+                Back to Dashboard
               </button>
             </div>
           )}
@@ -178,7 +188,7 @@ export default function ScanPage() {
                     <div className="scanner-step-number">
                       {status === 'completed' ? '✓' : status === 'active' ? <span className="spinner" style={{ width: 16, height: 16, borderWidth: 2 }} /> : phaseIndex(p.key) + 1}
                     </div>
-                    <span>{p.icon} {p.label}</span>
+                    <span>{p.label}</span>
                   </div>
                   <div className={`scanner-status ${status === 'active' ? 'running' : status === 'completed' ? 'done' : ''}`}>
                     {status === 'active' ? 'Running...' : status === 'completed' ? 'Complete' : 'Pending'}
@@ -189,13 +199,30 @@ export default function ScanPage() {
                 {status === 'completed' && p.key === 'hardware' && hardware && (
                   <div className="stat-grid animate-fade-in">
                     <div className="stat-item"><span className="stat-label">CPU Cores</span><span className="stat-value">{hardware.cpuCores ?? 'N/A'}</span></div>
-                    <div className="stat-item"><span className="stat-label">RAM</span><span className="stat-value">{hardware.deviceMemory ? `${hardware.deviceMemory} GB` : 'N/A'}</span></div>
+                    <div className="stat-item">
+                      <span className="stat-label">RAM (GB){hardware.deviceMemoryManual ? '' : ' — browser caps at 8'}</span>
+                      <input
+                        type="number"
+                        min={1}
+                        placeholder={formatRam(hardware.deviceMemory)}
+                        value={hardware.deviceMemoryManual ? hardware.deviceMemory ?? '' : ''}
+                        onChange={(e) => {
+                          const gb = Number(e.target.value);
+                          try {
+                            if (gb > 0) localStorage.setItem(RAM_KEY, String(gb));
+                            else localStorage.removeItem(RAM_KEY);
+                          } catch {}
+                          setHardware({ ...hardware, deviceMemory: gb > 0 ? gb : hardware.deviceMemory, deviceMemoryManual: gb > 0 });
+                        }}
+                        className="stat-value"
+                      />
+                    </div>
                     <div className="stat-item"><span className="stat-label">Screen</span><span className="stat-value">{hardware.screenWidth}×{hardware.screenHeight}</span></div>
                     <div className="stat-item"><span className="stat-label">Pixel Ratio</span><span className="stat-value">{hardware.devicePixelRatio}x</span></div>
                     <div className="stat-item"><span className="stat-label">Color Depth</span><span className="stat-value">{hardware.colorDepth}-bit</span></div>
                     <div className="stat-item"><span className="stat-label">Touch Points</span><span className="stat-value">{hardware.maxTouchPoints}</span></div>
                     <div className="stat-item"><span className="stat-label">Platform</span><span className="stat-value mono">{hardware.platform}</span></div>
-                    <div className="stat-item"><span className="stat-label">Battery</span><span className="stat-value">{hardware.battery ? `${Math.round(hardware.battery.level * 100)}%${hardware.battery.charging ? ' ⚡' : ''}` : 'N/A'}</span></div>
+                    <div className="stat-item"><span className="stat-label">Battery</span><span className="stat-value">{hardware.battery ? `${Math.round(hardware.battery.level * 100)}%${hardware.battery.charging ? ' ' : ''}` : 'N/A'}</span></div>
                     <div className="stat-item"><span className="stat-label">Storage</span><span className="stat-value">{hardware.storage ? formatBytes(hardware.storage.quota) : 'N/A'}</span></div>
                   </div>
                 )}
@@ -262,14 +289,14 @@ export default function ScanPage() {
 
                 {status === 'completed' && p.key === 'sensors' && sensors && (
                   <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-sm)' }}>
-                    <SensorTester name="Accelerometer" icon="📐" status={sensors.accelerometer} />
-                    <SensorTester name="Gyroscope" icon="🔄" status={sensors.gyroscope} />
-                    <SensorTester name="Magnetometer" icon="🧭" status={sensors.magnetometer} />
-                    <SensorTester name="Ambient Light" icon="💡" status={sensors.ambientLight} />
-                    <SensorTester name="Geolocation" icon="📍" status={sensors.geolocation} />
-                    <SensorTester name="Camera" icon="📷" status={sensors.camera} count={sensors.cameraDevices} />
-                    <SensorTester name="Microphone" icon="🎙️" status={sensors.microphone} count={sensors.micDevices} />
-                    <SensorTester name="Speakers" icon="🔊" status={sensors.speakers} count={sensors.speakerDevices} />
+                    <SensorTester name="Accelerometer" status={sensors.accelerometer} />
+                    <SensorTester name="Gyroscope" status={sensors.gyroscope} />
+                    <SensorTester name="Magnetometer" status={sensors.magnetometer} />
+                    <SensorTester name="Ambient Light" status={sensors.ambientLight} />
+                    <SensorTester name="Geolocation" status={sensors.geolocation} />
+                    <SensorTester name="Camera" status={sensors.camera} count={sensors.cameraDevices} />
+                    <SensorTester name="Microphone" status={sensors.microphone} count={sensors.micDevices} />
+                    <SensorTester name="Speakers" status={sensors.speakers} count={sensors.speakerDevices} />
                   </div>
                 )}
               </div>

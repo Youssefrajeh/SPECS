@@ -6,7 +6,7 @@ import type { SavedDevice } from '@/src/lib/types';
 import { loadDevices } from '@/src/lib/storage';
 import RadarChart from '@/src/components/RadarChart';
 
-const CHART_COLORS = ['#6366f1', '#22d3ee', '#f59e0b', '#f472b6', '#34d399', '#a855f7'];
+const CHART_COLORS = ['#3b82f6', '#22c55e', '#eab308', '#ef4444', '#a1a1aa', '#38bdf8'];
 
 function formatBytes(bytes: number): string {
   if (bytes === 0) return '0 B';
@@ -185,13 +185,12 @@ export default function ComparePage() {
       <div className="page">
         <div className="container">
           <div className="empty-state">
-            <div className="empty-state-icon">⚖️</div>
             <h3 className="empty-state-title">Not enough devices</h3>
             <p className="empty-state-text">
               You need at least 2 saved device reports to use the comparison tool.
               Currently you have {allDevices.length}.
             </p>
-            <Link href="/scan" className="btn btn-primary">⚡ Run a Scan</Link>
+            <Link href="/scan" className="btn btn-primary">Run a Scan</Link>
           </div>
         </div>
       </div>
@@ -203,7 +202,7 @@ export default function ComparePage() {
       <div className="container">
         <div className="animate-fade-in" style={{ marginBottom: 'var(--space-2xl)' }}>
           <h1 className="section-title">
-            <span className="gradient-text">Compare Devices</span>
+            Compare Devices
           </h1>
           <p className="section-subtitle">
             Select 2–4 devices to compare side by side.

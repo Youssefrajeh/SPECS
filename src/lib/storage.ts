@@ -1,4 +1,5 @@
 import type { SavedDevice, DeviceReport } from './types';
+import { formatRam } from './types';
 
 const STORAGE_KEY = 'specs_devices';
 
@@ -9,7 +10,7 @@ function generateId(): string {
 function generateNickname(report: DeviceReport): string {
   const platform = report.hardware.platform || 'Unknown';
   const cores = report.hardware.cpuCores ? `${report.hardware.cpuCores}-core` : '';
-  const ram = report.hardware.deviceMemory ? `${report.hardware.deviceMemory}GB` : '';
+  const ram = report.hardware.deviceMemory ? formatRam(report.hardware.deviceMemory, report.hardware.deviceMemoryManual).replace(' ', '') : '';
   const parts = [platform, cores, ram].filter(Boolean);
   return parts.join(' • ') || 'Unknown Device';
 }

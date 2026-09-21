@@ -7,17 +7,17 @@ export default function Header() {
   const pathname = usePathname();
 
   const links = [
-    { href: '/', label: 'Dashboard', icon: '📊' },
-    { href: '/scan', label: 'Run Scan', icon: '🔍' },
-    { href: '/compare', label: 'Compare', icon: '⚖️' },
+    { href: '/', label: 'Dashboard' },
+    { href: '/scan', label: 'Run Scan' },
+    { href: '/compare', label: 'Compare' },
   ];
 
   return (
     <header className="header">
       <div className="header-inner">
         <Link href="/" className="logo">
-          <span className="logo-icon">⚡</span>
-          <span className="gradient-text">SPECS</span>
+          <span className="logo-mark" aria-hidden />
+          <span>SPECS</span>
         </Link>
         <nav className="nav">
           {links.map((link) => (
@@ -26,7 +26,7 @@ export default function Header() {
               href={link.href}
               className={`nav-link ${pathname === link.href ? 'active' : ''}`}
             >
-              <span>{link.icon}</span> {link.label}
+              {link.label}
             </Link>
           ))}
         </nav>

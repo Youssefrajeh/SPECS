@@ -4,7 +4,6 @@ import type { SensorStatus } from '@/src/lib/types';
 
 interface SensorTesterProps {
   name: string;
-  icon: string;
   status: SensorStatus;
   count?: number;
   onTest?: () => Promise<void>;
@@ -14,22 +13,21 @@ interface SensorTesterProps {
 function statusBadge(status: SensorStatus) {
   switch (status) {
     case 'available':
-      return <span className="badge supported">✓ Available</span>;
+      return <span className="badge supported">Available</span>;
     case 'unavailable':
-      return <span className="badge unsupported">✗ Unavailable</span>;
+      return <span className="badge unsupported">Unavailable</span>;
     case 'denied':
-      return <span className="badge partial">🚫 Denied</span>;
+      return <span className="badge partial">Denied</span>;
     case 'untested':
-      return <span className="badge untested">? Untested</span>;
+      return <span className="badge untested">Untested</span>;
   }
 }
 
-export default function SensorTester({ name, icon, status, count, onTest, testing }: SensorTesterProps) {
+export default function SensorTester({ name, status, count, onTest, testing }: SensorTesterProps) {
   return (
     <div className="stat-item" style={{ flexDirection: 'column', alignItems: 'stretch', gap: 'var(--space-sm)' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-sm)' }}>
-          <span style={{ fontSize: 'var(--text-xl)' }}>{icon}</span>
           <div>
             <div className="stat-label" style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{name}</div>
             {count !== undefined && count > 0 && (

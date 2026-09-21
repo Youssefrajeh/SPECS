@@ -31,19 +31,13 @@ export default function ProgressRing({ progress, size = 80, strokeWidth = 6 }: P
           cy={size / 2}
           r={radius}
           fill="none"
-          stroke="url(#progressGradient)"
+          stroke="var(--accent-blue)"
           strokeWidth={strokeWidth}
           strokeLinecap="round"
           strokeDasharray={circumference}
           strokeDashoffset={offset}
           style={{ transition: 'stroke-dashoffset 0.5s ease-out' }}
         />
-        <defs>
-          <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="var(--accent-blue)" />
-            <stop offset="100%" stopColor="var(--accent-purple)" />
-          </linearGradient>
-        </defs>
       </svg>
       <span style={{ 
         fontSize: 'var(--text-sm)', 

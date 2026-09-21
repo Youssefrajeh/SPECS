@@ -16,6 +16,7 @@ export interface HardwareInfo {
   cpuCores: number | null;
   cpuPerformanceTier: number | null;
   deviceMemory: number | null; // GB
+  deviceMemoryManual?: boolean; // true when entered by the user instead of detected
   screenWidth: number;
   screenHeight: number;
   devicePixelRatio: number;
@@ -121,4 +122,10 @@ export interface SavedDevice {
   nickname: string;
   timestamp: number; // Date.now()
   report: DeviceReport;
+}
+
+/** navigator.deviceMemory is rounded and capped at 8 by browsers, so 8 means "8 GB or more". */
+export function formatRam(gb: number | null | undefined, manual = false): string {
+  if (!gb) return 'N/A';
+  return gb >= 8 && !manual ? '8+ GB' : `${gb} GB`;
 }

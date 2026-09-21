@@ -69,7 +69,7 @@ export default function HomePage() {
         {/* Hero */}
         <div className="hero animate-fade-in">
           <h1 className="hero-title">
-            <span className="gradient-text">Device Diagnostics</span>
+            Device Diagnostics
           </h1>
           <p className="hero-subtitle">
             Test your device&apos;s hardware, network, browser capabilities, and performance.
@@ -77,11 +77,11 @@ export default function HomePage() {
           </p>
           <div className="hero-actions">
             <Link href="/scan" className="btn btn-primary btn-lg">
-              ⚡ Run Full Diagnostic
+              Run Full Diagnostic
             </Link>
             {devices.length >= 2 && (
               <Link href="/compare" className="btn btn-secondary btn-lg">
-                ⚖️ Compare Devices
+                Compare Devices
               </Link>
             )}
           </div>
@@ -91,16 +91,15 @@ export default function HomePage() {
         {devices.length > 0 && (
           <div className="animate-slide-up" style={{
             display: 'flex',
-            gap: 'var(--space-lg)',
-            justifyContent: 'center',
-            marginBottom: 'var(--space-3xl)',
+            gap: 'var(--space-md)',
+            marginBottom: 'var(--space-xl)',
             flexWrap: 'wrap',
           }}>
-            <div className="stat-item" style={{ minWidth: 200 }}>
+            <div className="stat-item" style={{ flex: '1 1 160px' }}>
               <span className="stat-label">Devices Tested</span>
               <span className="stat-value">{devices.length}</span>
             </div>
-            <div className="stat-item" style={{ minWidth: 200 }}>
+            <div className="stat-item" style={{ flex: '1 1 160px' }}>
               <span className="stat-label">Last Test</span>
               <span className="stat-value mono" style={{ fontSize: 'var(--text-xs)' }}>
                 {new Date(Math.max(...devices.map((d) => d.timestamp))).toLocaleDateString()}
@@ -120,15 +119,15 @@ export default function HomePage() {
             gap: 'var(--space-md)',
           }}>
             <h2 className="section-title" style={{ margin: 0 }}>Saved Devices</h2>
-            <div style={{ display: 'flex', gap: 'var(--space-sm)' }}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-sm)' }}>
               <button className="btn btn-secondary btn-sm" onClick={handleExport}>
-                📤 Export
+                Export
               </button>
               <button
                 className="btn btn-secondary btn-sm"
                 onClick={() => fileInputRef.current?.click()}
               >
-                📥 Import
+                Import
               </button>
               <input
                 ref={fileInputRef}
@@ -154,20 +153,19 @@ export default function HomePage() {
           </div>
         ) : (
           <div className="empty-state animate-slide-up">
-            <div className="empty-state-icon">🖥️</div>
             <h3 className="empty-state-title">No devices tested yet</h3>
             <p className="empty-state-text">
               Run your first diagnostic to see your device&apos;s capabilities and benchmark scores.
             </p>
-            <div style={{ display: 'flex', gap: 'var(--space-sm)', justifyContent: 'center' }}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-sm)', justifyContent: 'center' }}>
               <Link href="/scan" className="btn btn-primary">
-                ⚡ Start First Scan
+                Start First Scan
               </Link>
               <button
                 className="btn btn-secondary"
                 onClick={() => fileInputRef.current?.click()}
               >
-                📥 Import Data
+                Import Data
               </button>
               <input
                 ref={fileInputRef}
